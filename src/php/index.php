@@ -1,4 +1,5 @@
 <?
+use DDTrace\SpanData;
 
 function insertUser($conn) {
 	$stmt = $conn->prepare("INSERT INTO users(name) VALUES(?)");
@@ -30,6 +31,15 @@ function listUsers($conn) {
 	echo "<input type=\"submit\" value=\"Add\" />";
 	echo "</form>";
 }
+
+// Datadog APM can instrument automatically known frameworks etc.
+// Manual instrumentation is also possible by calling trace_function
+// or trace_method on the function or method. Use the function definition
+// to customize the span data.
+// https://docs.datadoghq.com/tracing/setup_overview/custom_instrumentation/php/?tab=tracingfunctioncalls
+\DDTrace\trace_function('insertUser', function(SpanData $span, $args, $retval) {});
+\DDTrace\trace_function('deleteUser', function(SpanData $span, $args, $retval) {});
+\DDTrace\trace_function('listUsers', function(SpanData $span, $args, $retval) {});
 
 $conn = new mysqli("mariadb", "root", "secret", "db_name");
 
